@@ -1,5 +1,5 @@
 class Reservation:
-    def _init_(self, reservation_id, user_id, room_number, check_in, check_out):
+    def __init__(self, reservation_id, user_id, room_number, check_in, check_out):
         self.reservation_id = reservation_id
         self.user_id = user_id
         self.room_number = room_number
