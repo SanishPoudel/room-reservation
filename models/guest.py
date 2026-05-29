@@ -1,7 +1,7 @@
 from models.user import User
 
 class Guest(User):
-    def __init__(self, user_id, name, email, bookings):
+    def __init__(self, user_id, name, email, bookings=None):
         super().__init__(user_id, name, email)
         self.bookings = bookings if bookings is not None else []
 

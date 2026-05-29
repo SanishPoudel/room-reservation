@@ -91,7 +91,7 @@ class HotelSystem:
         return [r for guest in self.guests for r in guest.bookings]
     
     def _find_guest_by_id(self, guest_id):
-        return next((g for g in self.guests if g.guest == guest_id), None)
+        return next((g for g in self.guests if g.guest_id == guest_id), None)
     
 
     def _save_bookings(self):                                   

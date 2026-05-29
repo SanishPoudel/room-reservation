@@ -21,6 +21,15 @@ class Main:
                 case '1':
                     self.search_rooms()
 
+                case '2':
+                    self.hotel_system.make_reservation()
+
+                case '3':
+                    self.hotel_system.modify_booking()
+
+                case '4':
+                    self.hotel_system.check_out()
+
                 case '5':
                     # admin_id = int(print('Enter admin id: '))
                     # id(admin_id)
