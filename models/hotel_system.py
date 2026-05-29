@@ -13,13 +13,37 @@ class HotelSystem:
     def __init__(self, room = None):
         self.room = room
         self.room_file_path = 'data/rooms.xlsx'
+        self.booking_file_path = 'data/bookings.xlsx'
         self.guests = [] # reservations live on guest now 
-
-    # TODO: preload data here
-
+        self._preload_data()
 
     # create data folder if it doesn't exist, to save rooms data
     os.makedirs('data', exist_ok=True)
+        
+
+    def _preload_data(self):
+        # load bookings from file and rebuild guests list
+        if not os.path.exists(self.booking_file_path):
+            return
+        df = pd.read_excel(self.booking_file_path)
+        if df.empty:
+            return
+        for _, row in df.iterrows():
+            guest_id   = str(row['Guest ID'])
+            guest_name = str(row['Guest Name'])
+            room_obj   = Room(None, str(row['Room Number']), str(row['Room Type']),
+                              float(row['Nightly Rate']), str(row['Room Status']), int(row['Capacity']))
+            svcs = str(row['Services']).split('|') if str(row['Services']) != 'nan' else []
+            res  = Reservation(str(row['Reservation ID']), guest_id, room_obj,
+                               str(row['Check In']), str(row['Check Out']), svcs)
+            res.status       = str(row['Status'])
+            res.total_charge = float(row['Total Charge'])
+            # find existing guest or create one
+            guest = self._find_guest_by_id(guest_id)
+            if not guest:
+                guest = Guest(guest_id, guest_name, '')
+                self.guests.append(guest)
+            guest.make_booking(res)
     
     # add room
     def add_rooms(self):
@@ -91,7 +115,7 @@ class HotelSystem:
         return [r for guest in self.guests for r in guest.bookings]
     
     def _find_guest_by_id(self, guest_id):
-        return next((g for g in self.guests if g.guest == guest_id), None)
+        return next((g for g in self.guests if g.guest_id == guest_id), None)
     
 
     def _save_bookings(self):                                   
