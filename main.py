@@ -25,9 +25,6 @@ class Main:
                     self.hotel_system.make_reservation()
 
                 case '3':
-                    self.hotel_system.modify_booking()
-
-                case '4':
                     self.hotel_system.check_out()
 
                 case '5':
