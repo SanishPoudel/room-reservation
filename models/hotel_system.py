@@ -217,3 +217,23 @@ class HotelSystem:
  
         print('\n  Updated reservation:')
         res.generate_summary()
+
+
+    def check_out(self):
+        print('\nCheck-out')
+        res_id = input('  Reservation ID: ').strip()
+        res = next((r for r in self._all_reservations() if r.reservation_id == res_id and r.status == 'Confirmed'), None)
+        
+        if not res:
+            print('\n  Reservation not found or already checked out.\n')
+            return
+ 
+        res.status = 'Checked Out'
+ 
+        rooms = FileOperations.read_file(self.room_file_path)
+        rooms.loc[rooms['Room Number'].astype(str).str.lower() == res.room.room_number.lower(), 'Status'] = 'Available'
+        rooms.to_excel(self.room_file_path, index=False)
+ 
+        print('\n  Final bill:')
+        res.generate_summary()
+        print('\n  Thank you for your stay!\n')
