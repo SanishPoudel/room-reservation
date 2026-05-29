@@ -265,7 +265,7 @@ class HotelSystem:
  
         print('\n  Updated reservation:')
         res.generate_summary()
-        self._save_bookings
+        self._save_bookings()
 
 
     def check_out(self):
