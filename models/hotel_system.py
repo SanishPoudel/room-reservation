@@ -133,7 +133,6 @@ class HotelSystem:
             return
         
 
-        # optional services, services are not defined yet, just keeping it here as placeholder for later
         print('\n  Optional services ($500/service/night):')
         for i, s in enumerate(SERVICES, 1):
             print(f'    {i}. {s}')
@@ -158,3 +157,63 @@ class HotelSystem:
  
         print('\n  Reservation confirmed!')
         reservation.generate_summary()
+
+    
+    def modify_booking(self):
+        print('\n Modify Booking')
+        res_id = input('  Reservation ID: ').strip()
+        res = next((r for r in self._all_reservations() if r.reservation_id == res_id), None)
+        
+        if not res:
+            print('\n  Reservation not found.\n')
+            return
+ 
+        res.generate_summary()
+        print('\n  What to modify?')
+        print('  1. Check-in time')
+        print('  2. Change room')
+        choice = input('  Choice: ').strip()
+ 
+        if choice == '1':
+            new_time = input('  New check-in time (HH:MM): ').strip()
+            date_part = res.check_in.split()[0]
+            res.check_in = f'{date_part} {new_time}'
+            print('\n  Check-in time updated.')
+ 
+        elif choice == '2':
+            rooms = FileOperations.read_file(self.room_file_path)
+            available = rooms[rooms['Status'].str.lower() == 'available']
+            
+            if available.empty:
+                print('\n  No other rooms available.\n')
+                return
+            
+            print('\n  Available rooms:')
+            print(available[['Room Number', 'Room Type', 'Price', 'Capacity']].to_string(index=False))
+            new_room = input('\n  New room number: ').strip()
+            match = rooms[rooms['Room Number'].astype(str).str.lower() == new_room.lower()]
+            
+            if match.empty or match.iloc[0]['Status'].lower() != 'available':
+                print('\n  Room not available.\n')
+                return
+            
+            if not self.validate_no_overlap(new_room, res.check_in.split()[0], res.check_out):
+                print('\n  New room already booked for those dates.\n')
+                return
+            
+            rooms.loc[rooms['Room Number'].astype(str).str.lower() == res.room.room_number.lower(), 'Status'] = 'Available'
+            rooms.loc[rooms['Room Number'].astype(str).str.lower() == new_room.lower(), 'Status'] = 'Occupied'
+            rooms.to_excel(self.room_file_path, index=False)
+            
+            new_room_obj = Room(None, new_room, match.iloc[0]['Room Type'], float(match.iloc[0]['Price']), 'Occupied', int(match.iloc[0]['Capacity']))
+            
+            res.room = new_room_obj
+            res.total_charge = res.calculate_fee()
+            print('\n  Room updated.')
+ 
+        else:
+            print('\n  Invalid choice.\n')
+            return
+ 
+        print('\n  Updated reservation:')
+        res.generate_summary()
