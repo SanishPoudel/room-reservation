@@ -19,7 +19,7 @@ class Room:
         self.status = status
 
     def is_available(self):
-        return self.status.lower() == "active"
+        return self.status.lower() == "available"
     
     def calculate_fee(self, nights):
         return self.nightly_rate * nights
