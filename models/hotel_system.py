@@ -67,7 +67,7 @@ class HotelSystem:
             new_row.to_excel('data/rooms.xlsx', index=False)
 
         print(f'Room {self.room.room_id} saved successfully.')
-        print()
+
 
     # list rooms available
     def list_all_rooms(self):
