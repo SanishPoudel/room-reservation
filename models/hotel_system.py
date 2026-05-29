@@ -94,6 +94,29 @@ class HotelSystem:
         return next((g for g in self.guests if g.guest == guest_id), None)
     
 
+    def _save_bookings(self):                                   
+        all_res = self._all_reservations()
+        if not all_res:
+            return
+        guest_map = {r.reservation_id: g for g in self.guests for r in g.bookings}
+        data = [{
+            'Reservation ID': r.reservation_id,
+            'Guest ID'      : r.guest_id,
+            'Guest Name'    : guest_map[r.reservation_id].name,
+            'Room Number'   : r.room.room_number,
+            'Room Type'     : r.room.room_type,
+            'Nightly Rate'  : r.room.nightly_rate,
+            'Room Status'   : r.room.status,
+            'Capacity'      : r.room.capacity,
+            'Check In'      : r.check_in,
+            'Check Out'     : r.check_out,
+            'Services'      : '|'.join(r.services),
+            'Total Charge'  : r.total_charge,
+            'Status'        : r.status,
+        } for r in all_res]
+        pd.DataFrame(data).to_excel(self.booking_file_path, index=False)
+
+
     def make_reservation(self):
         print("\nMake a reservation\n")
         guest_id = input("Guest Id: ").strip()
