@@ -255,7 +255,7 @@ class HotelSystem:
             new_room_obj = Room(None, new_room, match.iloc[0]['Room Type'], float(match.iloc[0]['Price']), 'Occupied', int(match.iloc[0]['Capacity']))
             
             res.room = new_room_obj
-            res.total_charge = res.calculate_fee()
+
             print('\n  Room updated.')
  
         else:
