@@ -152,7 +152,12 @@ class HotelSystem:
             self.guests.append(guest)
         
         rooms = FileOperations.read_file(self.room_file_path)
-        available = rooms[rooms['Status'].str.lower() == 'available']
+
+        if rooms.empty:
+            print("\n No rooms available")
+
+
+        available = rooms[rooms['Status'].str.lower().isin(['available', 'active'])]
         
         if available.empty:
             print('\n  No rooms available.\n')
@@ -229,7 +234,7 @@ class HotelSystem:
  
         elif choice == '2':
             rooms = FileOperations.read_file(self.room_file_path)
-            available = rooms[rooms['Status'].str.lower() == 'available']
+            available = rooms[rooms['Status'].str.lower().isin(['available', 'active'])]
             
             if available.empty:
                 print('\n  No other rooms available.\n')
@@ -240,11 +245,11 @@ class HotelSystem:
             new_room = input('\n  New room number: ').strip()
             match = rooms[rooms['Room Number'].astype(str).str.lower() == new_room.lower()]
             
-            if match.empty or match.iloc[0]['Status'].lower() != 'available':
+            if match.empty or match.iloc[0]['Status'].lower() not in ('available','active'):
                 print('\n  Room not available.\n')
                 return
             
-            if not self.validate_no_overlap(new_room, res.check_in.split()[0], res.check_out):
+            if not self.validate_no_overlap(new_room, res.check_in.split()[0], res.check_out.split()[0]):
                 print('\n  New room already booked for those dates.\n')
                 return
             
